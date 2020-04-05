@@ -109,16 +109,16 @@ void Decompress(Parameters *P, CModel **cModels, uint8_t id){
     }
 
   int nmodels = totModels+1;
-  float **probs = malloc(nmodels * sizeof(float *));
+  float **probs = calloc(nmodels, sizeof(float *));
   for(n = 0; n < nmodels; n++) {
-    probs[n] = malloc(ALPHABET_SIZE * sizeof(float *));
+    probs[n] = calloc(ALPHABET_SIZE, sizeof(float));
   }
 
-  long **freqs = (long **)malloc(totModels * sizeof(long *));
-  long *sums = (long *)malloc(totModels * sizeof(long));
+  long **freqs = calloc(totModels, sizeof(long *));
   for (n = 0; n < totModels; n++) {
-    freqs[n] = (long*)malloc(ALPHABET_SIZE * sizeof(long));
+    freqs[n] = calloc(ALPHABET_SIZE, sizeof(long));
   }
+  long *sums = calloc(totModels, sizeof(long));
 
   mix_state_t *mxs = mix_init(nmodels, ALPHABET_SIZE, hs);
 
@@ -232,7 +232,6 @@ void Decompress(Parameters *P, CModel **cModels, uint8_t id){
   doneinputtingbits();
 
   fclose(Writter);
-  mix_free(mxs);
   Free(MX);
   Free(name);
 
@@ -256,7 +255,19 @@ void Decompress(Parameters *P, CModel **cModels, uint8_t id){
 
   if(P->verbose == 1)
     fprintf(stderr, "Done!                          \n");  // SPACES ARE VALID
+
+  mix_free(mxs);
+  free(sums);
+  for (n = 0; n < totModels; ++n) {
+    free(freqs[n]);
   }
+  free(freqs);
+
+  for(n = 0; n < nmodels; ++n) {
+    free(probs[n]);
+  }
+  free(probs);
+}
 
 
 //////////////////////////////////////////////////////////////////////////////
