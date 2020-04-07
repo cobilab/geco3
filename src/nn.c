@@ -23,19 +23,15 @@ ann_t* ann_init(uint64_t xs, uint64_t hs, uint64_t ys) {
   float r;
   float *w1 = ann->wxh;
   float *w2 = ann->why;
-  int i, j;
-  for(i = 0; i < xs; ++i) {
-    for(j = 0; j < hs; ++j) {
-      r = (((float)rand() / RAND_MAX) * 2.0) - 1.0;
-      *w1++ = r * sqrtf(6.0 / (xs + hs));
-    }
+  int i;
+  for(i = 0; i < xs * hs; ++i) {
+    r = (((float)rand() / RAND_MAX) * 2.0) - 1.0;
+    *w1++ = r * sqrtf(6.0 / (xs + hs));
   }
 
-  for(i = 0; i < hs + 1; ++i) {
-    for(j = 0; j < ys; ++j) {
-      r = (((float)rand() / RAND_MAX) * 2.0) - 1.0;
-      *w2++ = r * sqrtf(6.0 / (ys + hs + 1));
-    }
+  for(i = 0; i < (hs + 1) * ys; ++i) {
+    r = (((float)rand() / RAND_MAX) * 2.0) - 1.0;
+    *w2++ = r * sqrtf(6.0 / (ys + hs + 1));
   }
 
   return ann;
@@ -63,10 +59,6 @@ void ann_apply(ann_t *ann) {
   const uint32_t xs = ann->xs;
   const uint32_t hs = ann->hs;
   const uint32_t ys = ann->ys;
-
-  for(i = 0; i < ys; ++i) {
-    ann->y[i] = sig(ann->y[i]);
-  }
 
   for(i = 0; i < hs; ++i) {
     ann->h[i] = 0;
