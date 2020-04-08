@@ -48,9 +48,11 @@ float const* mix(mix_state_t* mxs, float **probs) {
   float *ret = mxs->ann->y;
   int i, j, k = 0;
   const float smean = mxs->smean;
+  const uint32_t nmodels = mxs->nmodels;
+  const uint32_t nsymbols = mxs->nsymbols;
 
-  for(i = 0; i < mxs->nmodels; i++) {
-    for(j = 0; j < mxs->nsymbols; j++) {
+  for(i = 0; i < nmodels; i++) {
+    for(j = 0; j < nsymbols; j++) {
       mxs->ann->x[k++] = stretch(probs[i][j]) - smean;
     }
 
@@ -61,10 +63,10 @@ float const* mix(mix_state_t* mxs, float **probs) {
 
   mxs->ann->x[k++] = mxs->nnbits;
 
-  int sf1[mxs->nsymbols];
-  int sf2[mxs->nsymbols];
-  int sf3[mxs->nsymbols];
-  for(i = 0; i < mxs->nsymbols; ++i) {
+  int sf1[nsymbols];
+  int sf2[nsymbols];
+  int sf3[nsymbols];
+  for(i = 0; i < nsymbols; ++i) {
     sf1[i] = 0;
     sf2[i] = 0;
     sf3[i] = 0;
@@ -83,7 +85,7 @@ float const* mix(mix_state_t* mxs, float **probs) {
   }
 
 
-  for(i = 0; i < mxs->nsymbols; ++i) {
+  for(i = 0; i < nsymbols; ++i) {
     mxs->ann->x[k++] = (((float)sf1[i] / mxs->symlogs1) - 0.5) * 2;
     mxs->ann->x[k++] = (((float)sf2[i] / mxs->symlogs2) - 0.5) * 2;
     mxs->ann->x[k++] = (((float)sf3[i] / mxs->symlogs3) - 0.5) * 2;
@@ -95,31 +97,6 @@ float const* mix(mix_state_t* mxs, float **probs) {
 }
 
 void calc_aggregates(mix_state_t* mxs, float **probs, uint8_t sym) {
-  int i, j;
-  // Calculate aggregates
-  // last N symbols (symbol log)
-  for(i = mxs->symlogs3 - 1; i > 0 ; --i) {
-    mxs->symlog[i] = mxs->symlog[i-1];
-  }
-  mxs->symlog[0] = sym;
-
-  float bestp = probs[0][sym];
-  int ignorant[mxs->nmodels];
-
-  for(i = 0 ; i < mxs->nmodels; ++i) {
-    if(bestp < probs[i][sym]) {
-      bestp = probs[i][sym];
-    }
-    float p = probs[i][0];
-    ignorant[i] = 1;
-    for(j = 1 ; j < mxs->nsymbols; ++j) {
-      if(p != probs[i][j]) {
-	ignorant[i] = 0;
-	break;
-      }
-    }
-  }
-
   const float alpha = 0.5;
   const float nalpha = 1 - alpha;
   const float lmean = mxs->lmean;
@@ -127,31 +104,49 @@ void calc_aggregates(mix_state_t* mxs, float **probs, uint8_t sym) {
   const float a = 0.15;
   const float na = 1 - a;
 
-  float nnb = -fasterlog2(mxs->ann->y[sym]) + lmean;
+  const float nnb = -fasterlog2(mxs->ann->y[sym]) + lmean;
   mxs->nnbits = (a * nnb) + (na * mxs->nnbits);
 
-  for(i = 0 ; i < mxs->nmodels; ++i) {
+  const uint32_t nmodels = mxs->nmodels;
+  const uint32_t nsymbols = mxs->nsymbols;
+
+  // last N symbols (symbol log)
+  int i, j;
+  for(i = mxs->symlogs3 - 1; i > 0 ; --i) {
+    mxs->symlog[i] = mxs->symlog[i-1];
+  }
+  mxs->symlog[0] = sym;
+
+  float bestp = probs[0][sym];
+  int ignorant[nmodels];
+  int hit[nmodels];
+
+  for(i = 0 ; i < nmodels; ++i) {
+    const float psym = probs[i][sym];
+    bestp = (bestp < psym) ? psym : bestp;
+
+    const float p = probs[i][0];
+    ignorant[i] = 1;
+    hit[i] = (psym >= p);
+    for(j = 1 ; j < nsymbols; ++j) {
+      ignorant[i] &= (p == probs[i][j]);
+      hit[i] &= (psym >= probs[i][j]);
+    }
+  }
+
+  for(i = 0 ; i < nmodels; ++i) {
     const float psym = probs[i][sym];
     const float t = -fasterlog2(psym) + lmean;
     mxs->bits[i] = (alpha * t) + (nalpha * mxs->bits[i]);
 
     if(!ignorant[i]) {
-      float hit = 0.1;
-      for(j = 0 ; j < mxs->nsymbols; ++j) {
-	if(psym < probs[i][j]) {
-	  hit = -0.1;
-	  break;
-	}
-      }
-      mxs->hit[i] += hit;
+      mxs->hit[i] += hit[i] ? 0.1 : -0.1;
       mxs->hit[i] = fminf(1.0,  mxs->hit[i]);
       mxs->hit[i] = fmaxf(-1.0,  mxs->hit[i]);
 
-      mxs->best[i] -= 0.1;
-      mxs->best[i] += 0.2 * (bestp == psym);
+      mxs->best[i] += (bestp == psym) ? 0.1 : -0.1;
       mxs->best[i] = fminf(1.0,  mxs->best[i]);
       mxs->best[i] = fmaxf(-1.0,  mxs->best[i]);
-
     }
   }
 }
