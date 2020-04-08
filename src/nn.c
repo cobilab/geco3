@@ -4,7 +4,6 @@
 #include <math.h>
 
 #include "nn.h"
-#include "fastonebigheader.h"
 #include "common.h"
 
 ann_t* ann_init(uint64_t xs, uint64_t hs, uint64_t ys) {
@@ -45,14 +44,6 @@ void ann_free(ann_t *ann) {
   free(ann->h);
   free(ann->y);
   free(ann);
-}
-
-static inline float sig(float x) {
-  if(x < -45) {
-    return 0;
-  } else {
-    return fastsigmoid(x);
-  }
 }
 
 void ann_apply(ann_t *ann) {
