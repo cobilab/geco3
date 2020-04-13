@@ -147,6 +147,7 @@ void calc_aggregates(mix_state_t* mxs, float **probs, uint8_t sym) {
 }
 
 void mix_update_state(mix_state_t* mxs, float **probs, uint8_t sym, float learning_rate) {
+  calc_aggregates(mxs, probs, sym);
   // Train NN
   float tdata[mxs->nsymbols];
   int i;
@@ -156,7 +157,6 @@ void mix_update_state(mix_state_t* mxs, float **probs, uint8_t sym, float learni
   tdata[sym] = 1.0;
 
   ann_train(mxs->ann, tdata, learning_rate);
-  calc_aggregates(mxs, probs, sym);
 }
 
 void mix_free(mix_state_t* mxs) {
