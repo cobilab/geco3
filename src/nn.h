@@ -21,11 +21,7 @@ void ann_train(ann_t *ann, float *t, float learning_rate);
 void ann_free(ann_t *ann);
 
 static inline float sig(float x) {
-  if(x < -45) {
-    return 0;
-  } else {
-    return fastsigmoid(x);
-  }
+  return fastsigmoid(fmaxf(-45, x));
 }
 
 #endif
