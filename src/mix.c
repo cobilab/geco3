@@ -12,7 +12,7 @@ mix_state_t* mix_init(uint32_t nmodels, uint32_t nsymbols, uint32_t hs) {
   mxs->nmodels  = nmodels;
   mxs->nsymbols = nsymbols;
   int model_derived = 3; // hit, best, msym, bits
-  int sequence_derived = 3; // last 7, last 15, last 50 symbols
+  int sequence_derived = 4; // last 7, last 15, last 50 symbols
   int xs = (nmodels * (nsymbols + model_derived)) + (sequence_derived * nsymbols) + 1;
   xs++; //bias neuron
   printf("xs: %d\n", xs);
@@ -24,6 +24,7 @@ mix_state_t* mix_init(uint32_t nmodels, uint32_t nsymbols, uint32_t hs) {
   mxs->symlogs2 = 16; // empirically determined
   mxs->symlogs3 = 64; // empirically determined
   mxs->symlog = calloc(mxs->symlogs3, sizeof(uint8_t));
+  mxs->symloga = calloc(nsymbols, sizeof(float*));
 
   // model performance
   mxs->hit = calloc(nmodels, sizeof(float));
@@ -46,8 +47,8 @@ float const* mix(mix_state_t* mxs, float **probs) {
   const uint32_t nmodels = mxs->nmodels;
   const uint32_t nsymbols = mxs->nsymbols;
 
-  for(i = 0; i < nmodels; i++) {
-    for(j = 0; j < nsymbols; j++) {
+  for(i = 0; i < nmodels; ++i) {
+    for(j = 0; j < nsymbols; ++j) {
       mxs->ann->x[k++] = stretch(probs[i][j]) - smean;
     }
 
@@ -84,6 +85,7 @@ float const* mix(mix_state_t* mxs, float **probs) {
     mxs->ann->x[k++] = (((float)sf1[i] / mxs->symlogs1) - 0.5) * 2;
     mxs->ann->x[k++] = (((float)sf2[i] / mxs->symlogs2) - 0.5) * 2;
     mxs->ann->x[k++] = (((float)sf3[i] / mxs->symlogs3) - 0.5) * 2;
+    mxs->ann->x[k++] = mxs->symloga[i];
   }
 
   ann_apply(mxs->ann);
@@ -92,10 +94,7 @@ float const* mix(mix_state_t* mxs, float **probs) {
 }
 
 void calc_aggregates(mix_state_t* mxs, float **probs, uint8_t sym) {
-  const float alpha = 0.5;
-  const float nalpha = 1 - alpha;
   const float lmean = mxs->lmean;
-
   const float a = 0.15;
   const float na = 1 - a;
 
@@ -111,6 +110,17 @@ void calc_aggregates(mix_state_t* mxs, float **probs, uint8_t sym) {
     mxs->symlog[i] = mxs->symlog[i-1];
   }
   mxs->symlog[0] = sym;
+
+  const float alpha = 0.5;
+  const float nalpha = 1 - alpha;
+
+  for(i = 0; i < nsymbols; ++i) {
+    if(i == sym) {
+      mxs->symloga[i] = alpha + (nalpha * mxs->symloga[i]);
+    } else {
+      mxs->symloga[i] = -alpha + (nalpha * mxs->symloga[i]);
+    }
+  }
 
   float bestp = probs[0][sym];
   int ignorant[nmodels];
@@ -135,13 +145,13 @@ void calc_aggregates(mix_state_t* mxs, float **probs, uint8_t sym) {
     mxs->bits[i] = (alpha * t) + (nalpha * mxs->bits[i]);
 
     if(!ignorant[i]) {
-      mxs->hit[i] += hit[i] ? 0.1 : -0.1;
-      mxs->hit[i] = fminf(1.0,  mxs->hit[i]);
-      mxs->hit[i] = fmaxf(-1.0,  mxs->hit[i]);
-
       mxs->best[i] += (bestp == psym) ? 0.1 : -0.1;
       mxs->best[i] = fminf(1.0,  mxs->best[i]);
       mxs->best[i] = fmaxf(-1.0,  mxs->best[i]);
+
+      mxs->hit[i] += hit[i] ? 0.1 : -0.1;
+      mxs->hit[i] = fminf(1.0,  mxs->hit[i]);
+      mxs->hit[i] = fmaxf(-1.0,  mxs->hit[i]);
     }
   }
 }
