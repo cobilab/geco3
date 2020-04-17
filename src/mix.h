@@ -11,7 +11,6 @@ typedef struct mix_state_t {
   float *bits;
   float nnbits;
   uint8_t *symlog;
-  float *symloga;
 
   float smean;
   float lmean;
