@@ -346,11 +346,27 @@ CModel **LoadReference(Parameters *P)
 
       for(n = 0 ; n < P->nModels ; ++n)
         if(P->model[n].type == REFERENCE){
+
           GetPModelIdx(symbolBuffer+idx-1, cModels[n]);
-          UpdateCModelCounter(cModels[n], sym, cModels[n]->pModelIdx);
-          if(cModels[n]->ir == 1){                        // Inverted repeats
+
+          // UPDATE ONLY IF IDX LARGER THAT CONTEXT
+          switch(cModels[n]->ir)
+            {
+            case 0:
+            UpdateCModelCounter(cModels[n], sym, cModels[n]->pModelIdx);
+            break;
+            case 1:
+            UpdateCModelCounter(cModels[n], sym, cModels[n]->pModelIdx);
             irSym = GetPModelIdxIR(symbolBuffer+idx, cModels[n]);
             UpdateCModelCounter(cModels[n], irSym, cModels[n]->pModelIdxIR);
+            break;
+            case 2:
+            irSym = GetPModelIdxIR(symbolBuffer+idx, cModels[n]);
+            UpdateCModelCounter(cModels[n], irSym, cModels[n]->pModelIdxIR);
+            break;
+            default:
+            UpdateCModelCounter(cModels[n], sym, cModels[n]->pModelIdx);
+            break;
             }
           }
 

@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // - - - - - - - - - - - - - - C O M P R E S S O R - - - - - - - - - - - - - -
 
-void Compress(Parameters *P, CModel **cModels, uint8_t id, uint32_t refNModels, INF *I, float lr, uint32_t hs){
+void Compress(Parameters *P, CModel **cModels, uint8_t id, INF *I, float lr, uint32_t hs){
   FILE        *Reader  = Fopen(P->tar[id], "r");
   char        *name    = concatenate(P->tar[id], ".co");
   FILE        *Writter = Fopen(name, "w");
@@ -411,14 +411,27 @@ CModel **LoadReference(Parameters *P)
 
       for(n = 0 ; n < P->nModels ; ++n)
         if(P->model[n].type == REFERENCE){
+
           GetPModelIdx(symbolBuffer+idx-1, cModels[n]);
-          if(cModels[n]->ir == 1)                        // Inverted repeats
-            irSym = GetPModelIdxIR(symbolBuffer+idx, cModels[n]);
-          // UPDATE ONLY IF IDX LARGER THAT CONTEXT
-          if(y_bases >= cModels[n]->ctx){
+
+	  // UPDATE ONLY IF IDX LARGER THAT CONTEXT
+          switch(cModels[n]->ir)
+            {
+            case 0:
             UpdateCModelCounter(cModels[n], sym, cModels[n]->pModelIdx);
-            if(cModels[n]->ir == 1)                        // Inverted repeats
-              UpdateCModelCounter(cModels[n], irSym, cModels[n]->pModelIdxIR);
+            break;
+            case 1:
+            UpdateCModelCounter(cModels[n], sym, cModels[n]->pModelIdx);
+            irSym = GetPModelIdxIR(symbolBuffer+idx, cModels[n]);
+            UpdateCModelCounter(cModels[n], irSym, cModels[n]->pModelIdxIR);
+            break;
+            case 2:
+            irSym = GetPModelIdxIR(symbolBuffer+idx, cModels[n]);
+            UpdateCModelCounter(cModels[n], irSym, cModels[n]->pModelIdxIR);
+            break;
+            default:
+            UpdateCModelCounter(cModels[n], sym, cModels[n]->pModelIdx);
+            break;
             }
           }
       ++y_bases;
@@ -456,8 +469,8 @@ CModel **LoadReference(Parameters *P)
 int32_t main(int argc, char *argv[]){
   char        **p = *&argv, **xargv, *xpl = NULL;
   CModel      **refModels;
-  int32_t     xargc = 0;
-  uint32_t    n, k, refNModels;
+  int32_t     n, xargc = 0;
+  uint32_t    k, refNModels;
   uint64_t    totalBytes, headerBytes, totalSize;
   clock_t     stop = 0, start = clock();
 
@@ -568,7 +581,7 @@ int32_t main(int argc, char *argv[]){
   totalBytes  = 0;
   headerBytes = 0;
   for(n = 0 ; n < P->nTar ; ++n){
-    Compress(P, refModels, n, refNModels, I, lr, hs);
+    Compress(P, refModels, n, I, lr, hs);
     totalSize   += I[n].size;
     totalBytes  += I[n].bytes;
     headerBytes += I[n].header;
