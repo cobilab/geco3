@@ -59,7 +59,7 @@ With these five files integrated into the project, the compressor now needs to `
 
 The mixer is initialized with: `mix_state_t *mxs = mix_init(NUMBER_OF_MODELS, ALPHABET_SIZE, NUMBER_OF_HIDDEN_NODES);`
 
-Every time a new symbol is seen the mixing is done with `const float* y = mix(mxs, probs);`. Where `probs[MODEL_idx][SYMBOL_IDX]`is a matrix with the probabilities (]0,1[) for each model and for each symbol in the alphabet. The return value contains the non-normalized probabilities for each symbol. One way of normalizing these probabilities is to divide each by the total sum.
+Every time a new symbol is seen the mixing is done with `const float* y = mix(mxs, probs);`. Where `probs[MODEL_IDX][SYMBOL_IDX]`is a matrix with the probabilities (]0,1[) for each model and for each symbol in the alphabet. The return value contains the non-normalized probabilities for each symbol. One way of normalizing these probabilities is to divide each by the total sum.
 
 Training must be done after invoking the mixing with `mix_update_state(mxs, probs, sym, lr);`. Where `sym` is the actual symbol seen encoded as an int [0, ALPHABET_SIZE[ and`lr`is the learning rate.
 
