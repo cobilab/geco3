@@ -62,8 +62,6 @@ typedef struct{
   }
 Parameters;
 
-U32 garbage;
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 #define RELEASE                0

@@ -45,7 +45,7 @@ void Decompress(Parameters *P, CModel **cModels, uint8_t id){
   start_decode(Reader);
 
   P[id].watermark           = ReadNBits(BITS_WATERMARK,   Reader);
-  garbage                   = ReadNBits(BITS_CHECKSUM,    Reader);
+  ReadNBits(BITS_CHECKSUM,    Reader);
   P[id].size                = ReadNBits(BITS_SIZE,        Reader);
   P[id].nModels             = ReadNBits(BITS_N_MODELS,    Reader);
   for(k = 0 ; k < P[id].nModels ; ++k)
