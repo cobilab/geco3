@@ -86,8 +86,8 @@ void Compress(Parameters *P, CModel **cModels, uint8_t id, INF *I, float lr, uin
   for(n = 0 ; n < P->nModels ; ++n)
     if(P->model[n].type == TARGET)
       cModels[n] = CreateCModel(TARGET, P->model[n].ctx, P->model[n].den,
-      P->model[n].ir, P->model[n].hashSize, P->model[n].gamma,
-      P->model[n].edits, P->model[n].eDen, P->model[n].eGamma);
+                                P->model[n].ir, P->model[n].hashSize, P->model[n].gamma,
+                                P->model[n].edits, P->model[n].eDen, P->model[n].eGamma);
 
   if(P->verbose)
     {
@@ -299,7 +299,7 @@ void Compress(Parameters *P, CModel **cModels, uint8_t id, INF *I, float lr, uin
     }
   #endif
 
-  Free(MX);
+  RemovePModel(MX);
   Free(name);
 
   for(n = 0 ; n < P->nModels ; ++n)
@@ -312,7 +312,7 @@ void Compress(Parameters *P, CModel **cModels, uint8_t id, INF *I, float lr, uin
     Free(pModel[n]);
     }
   Free(pModel);
-  Free(PT);
+  RemoveFPModel(PT);
   Free(readBUF);
   RemoveCBuffer(symbBUF);
   fclose(Reader);
@@ -334,6 +334,8 @@ void Compress(Parameters *P, CModel **cModels, uint8_t id, INF *I, float lr, uin
     free(probs[n]);
   }
   free(probs);
+
+  RemoveWeightModel(WM);
 }
 
 
@@ -604,6 +606,15 @@ int32_t main(int argc, char *argv[]){
   /totalSize), (8.0*totalBytes)/(2.0*totalSize));
   stop = clock();
   fprintf(stdout, "Spent %g sec.\n", ((double)(stop-start))/CLOCKS_PER_SEC);
+
+  Free(P->model);
+  Free(P->tar);
+  Free(P);
+
+  if(refNModels == 0)
+    Free(refModels);
+
+  Free(I);
 
   return EXIT_SUCCESS;
   }

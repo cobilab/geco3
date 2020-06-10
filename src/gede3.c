@@ -232,7 +232,7 @@ void Decompress(Parameters *P, CModel **cModels, uint8_t id){
   doneinputtingbits();
 
   fclose(Writter);
-  Free(MX);
+  RemovePModel(MX);
   Free(name);
 
   for(n = 0 ; n < P[id].nModels ; ++n)
