@@ -60,16 +60,13 @@ void ann_apply(ann_t *ann) {
     }
   }
 
-  for(i = 0; i < hs; ++i) {
-    ann->h[i] = sig(ann->h[i]);
-  }
-
   float *w2 = ann->why;
   for(i = 0; i < hs; ++i) {
-    const float hi = ann->h[i];
+    const float hi = sig(ann->h[i]);
     for(j = 0; j < ys; ++j) {
       ann->y[j] += *w2++ * hi;
     }
+    ann->h[i] = hi;
   }
 
   for(i = 0; i < ys; ++i) {
