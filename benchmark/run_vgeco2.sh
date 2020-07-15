@@ -5,8 +5,8 @@ INSTALL_GECO3=0;
 ###############################################################################
 DOWNLOAD=0;
 ###############################################################################
-RUN_GECO2=0;
-RUN_GECO3=0;
+RUN_GECO2=1;
+RUN_GECO3=1;
 ###############################################################################
 #
 function RunGeCo2 {
@@ -15,8 +15,8 @@ function RunGeCo2 {
 if test -f "../../ds/$2"; then
    cp ../../ds/$2 .
    rm -f $2.co
-   (time ./GeCo2 $1 $2 ) &> ../../res/C_GECO2_$2
-   ls -la $1.co | awk '{ print $5;}' > ../../res/BC_GECO2_$2
+   (time ./GeCo2 "$1" $2 ) &> ../../res/C_GECO2_$2
+   ls -la $2.co | awk '{ print $5;}' > ../../res/BC_GECO2_$2
    rm -f $2 $2.co;
 fi
 }
@@ -27,8 +27,8 @@ function RunGeCo3 {
 if test -f "../../ds/$2"; then
    cp ../../ds/$2 .
    rm -f $2.co
-   (time ./GeCo3 $2 $1 ) &> ../../res/C_GECO3_$2
-   ls -la $1.co | awk '{ print $5;}' > ../../res/BC_GECO3_$2
+   (time ./GeCo3 "$1" $2 ) &> ../../res/C_GECO3_$2
+   ls -la $2.co | awk '{ print $5;}' > ../../res/BC_GECO3_$2
    rm -f $2 $2.co;
 fi
 }
@@ -70,9 +70,14 @@ cd ..
 # DOWNLOAD
 if [[ "$DOWNLOAD" -eq "1" ]]; then
     echo "Downloading ..."
+    rm -rf ds/
+    mkdir ds/
     cd ds
     wget https://tinyurl.com/DNAcorpus
     unzip DNAcorpus
+    mv DNACorpus/* .
+    rm -f DNAcorpus 
+    rm -rf DNACorpus
     cd ..
 fi
 #
@@ -82,21 +87,21 @@ if [[ "$RUN_GECO2" -eq "1" ]]; then
    echo "Running GeCo2 ...";
    mkdir -p res
    cd progs/geco2
-   RunGeCo2 "-l 1 -lr 0.06 -hs 8" "DNACorpus/BuEb"
-   RunGeCo2 "-l 2 -lr 0.06 -hs 16" "DNACorpus/AgPh"
-   RunGeCo2 "-l 3 -lr 0.09 -hs 24" "DNACorpus/YeMi"
-   RunGeCo2 "-l 4 -lr 0.04 -hs 40" "DNACorpus/HePy"
-   RunGeCo2 "-l 5 -lr 0.04 -hs 16" "DNACorpus/AeCa"
-   RunGeCo2 "-l 5 -lr 0.04 -hs 40" "DNACorpus/HaHi"
-   RunGeCo2 "-l 6 -lr 0.03 -hs 40" "DNACorpus/EsCo"
-   RunGeCo2 "-l 7 -lr 0.03 -hs 40" "DNACorpus/PlFa"
-   RunGeCo2 "-l 8 -lr 0.03 -hs 40" "DNACorpus/ScPo"
-   RunGeCo2 "-l 9 -lr 0.05 -hs 64" "DNACorpus/EnIn"
-   RunGeCo2 "-l 10 -lr 0.03 -hs 64" "DNACorpus/DrMe"
-   RunGeCo2 "-l 10 -lr 0.03 -hs 64" "DNACorpus/OrSa"
-   RunGeCo2 "-l 10 -lr 0.03 -hs 64" "DNACorpus/DaRe"
-   RunGeCo2 "-l 11 -lr 0.03 -hs 64" "DNACorpus/GaGa"
-   RunGeCo2 "-l 12 -lr 0.03 -hs 64" "DNACorpus/HoSa"
+   RunGeCo2 "-l 1 -lr 0.06 -hs 8" "BuEb"
+   RunGeCo2 "-l 2 -lr 0.06 -hs 16" "AgPh"
+   RunGeCo2 "-l 3 -lr 0.09 -hs 24" "YeMi"
+   RunGeCo2 "-l 4 -lr 0.04 -hs 40" "HePy"
+   RunGeCo2 "-l 5 -lr 0.04 -hs 16" "AeCa"
+   RunGeCo2 "-l 5 -lr 0.04 -hs 40" "HaHi"
+   RunGeCo2 "-l 6 -lr 0.03 -hs 40" "EsCo"
+   RunGeCo2 "-l 7 -lr 0.03 -hs 40" "PlFa"
+   RunGeCo2 "-l 8 -lr 0.03 -hs 40" "ScPo"
+   RunGeCo2 "-l 9 -lr 0.05 -hs 64" "EnIn"
+   RunGeCo2 "-l 10 -lr 0.03 -hs 64" "DrMe"
+   RunGeCo2 "-l 10 -lr 0.03 -hs 64" "OrSa"
+   RunGeCo2 "-l 10 -lr 0.03 -hs 64" "DaRe"
+   RunGeCo2 "-l 11 -lr 0.03 -hs 64" "GaGa"
+   RunGeCo2 "-l 12 -lr 0.03 -hs 64" "HoSa"
    #
    cd ../../
    echo "Done!";
@@ -106,21 +111,21 @@ if [[ "$RUN_GECO3" -eq "1" ]]; then
    echo "Running GeCo3 ...";
    mkdir -p res
    cd progs/geco3
-   RunGeCo3 "-l 1 -lr 0.06 -hs 8" "DNACorpus/BuEb"
-   RunGeCo3 "-l 2 -lr 0.06 -hs 16" "DNACorpus/AgPh"
-   RunGeCo3 "-l 3 -lr 0.09 -hs 24" "DNACorpus/YeMi"
-   RunGeCo3 "-l 4 -lr 0.04 -hs 40" "DNACorpus/HePy"
-   RunGeCo3 "-l 5 -lr 0.04 -hs 16" "DNACorpus/AeCa"
-   RunGeCo3 "-l 5 -lr 0.04 -hs 40" "DNACorpus/HaHi"
-   RunGeCo3 "-l 6 -lr 0.03 -hs 40" "DNACorpus/EsCo"
-   RunGeCo3 "-l 7 -lr 0.03 -hs 40" "DNACorpus/PlFa"
-   RunGeCo3 "-l 8 -lr 0.03 -hs 40" "DNACorpus/ScPo"
-   RunGeCo3 "-l 9 -lr 0.05 -hs 64" "DNACorpus/EnIn"
-   RunGeCo3 "-l 10 -lr 0.03 -hs 64" "DNACorpus/DrMe"
-   RunGeCo3 "-l 10 -lr 0.03 -hs 64" "DNACorpus/OrSa"
-   RunGeCo3 "-l 10 -lr 0.03 -hs 64" "DNACorpus/DaRe"
-   RunGeCo3 "-l 11 -lr 0.03 -hs 64" "DNACorpus/GaGa"
-   RunGeCo3 "-l 12 -lr 0.03 -hs 64" "DNACorpus/HoSa"
+   RunGeCo3 "-l 1 -lr 0.06 -hs 8" "BuEb"
+   RunGeCo3 "-l 2 -lr 0.06 -hs 16" "AgPh"
+   RunGeCo3 "-l 3 -lr 0.09 -hs 24" "YeMi"
+   RunGeCo3 "-l 4 -lr 0.04 -hs 40" "HePy"
+   RunGeCo3 "-l 5 -lr 0.04 -hs 16" "AeCa"
+   RunGeCo3 "-l 5 -lr 0.04 -hs 40" "HaHi"
+   RunGeCo3 "-l 6 -lr 0.03 -hs 40" "EsCo"
+   RunGeCo3 "-l 7 -lr 0.03 -hs 40" "PlFa"
+   RunGeCo3 "-l 8 -lr 0.03 -hs 40" "ScPo"
+   RunGeCo3 "-l 9 -lr 0.05 -hs 64" "EnIn"
+   RunGeCo3 "-l 10 -lr 0.03 -hs 64" "DrMe"
+   RunGeCo3 "-l 10 -lr 0.03 -hs 64" "OrSa"
+   RunGeCo3 "-l 10 -lr 0.03 -hs 64" "DaRe"
+   RunGeCo3 "-l 11 -lr 0.03 -hs 64" "GaGa"
+   RunGeCo3 "-l 12 -lr 0.03 -hs 64" "HoSa"
    #
    cd ../../
    echo "Done!";
