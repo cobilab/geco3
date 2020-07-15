@@ -15,7 +15,7 @@ function RunGeCo2 {
 if test -f "../../ds/$2"; then
    cp ../../ds/$2 .
    rm -f $2.co
-   (time ./GeCo2 "$1" $2 ) &> ../../res/C_GECO2_$2
+   (time ./GeCo2 $1 $2 ) &> ../../res/C_GECO2_$2
    ls -la $2.co | awk '{ print $5;}' > ../../res/BC_GECO2_$2
    rm -f $2 $2.co;
 fi
@@ -27,7 +27,7 @@ function RunGeCo3 {
 if test -f "../../ds/$2"; then
    cp ../../ds/$2 .
    rm -f $2.co
-   (time ./GeCo3 "$1" $2 ) &> ../../res/C_GECO3_$2
+   (time ./GeCo3 $1 $2 ) &> ../../res/C_GECO3_$2
    ls -la $2.co | awk '{ print $5;}' > ../../res/BC_GECO3_$2
    rm -f $2 $2.co;
 fi
