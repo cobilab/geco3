@@ -81,6 +81,43 @@ if test -f "../../ds/$2"; then
 fi
 }
 
+function RunCMIX {
+    # 1 - seq
+if test -f "../../ds/$1"; then
+   cp ../../ds/$1 .
+   rm -f $1.cmix
+   (time ./cmix -c $1 $1.cmix ) &> ../../res/C_CMIX_$1
+   ls -la $2.jc | awk '{ print $5;}' > ../../res/BC_CMIX_$1
+   rm -f $1 $1.cmix;
+fi
+}
+
+function RunDEEPZIP {
+    # 1 - seq
+if test -f "../../ds/$1"; then
+   cp ../../ds/$1 data/files_to_be_compressed/$1
+   cd data
+   ./run_parser.sh
+   cd ../src
+   (time ./run_experiments.sh biGRU ) &> ../../res/C_DEEPZIP_$1
+   cd ../data/compressed/
+   ls -la $1 | awk '{ print $5;}' > ../../res/BC_DEEPZIP_$1
+   cd ../..
+   rm -f data/files_to_be_compressed/$1 data/compressed/$1;
+fi
+}
+
+function RunZPAQ {
+    # 1 - seq
+if test -f "../../ds/$1"; then
+   cp ../../ds/$1 .
+   rm -f $1.zpaq
+   (time ./zpaq a $1.zpaq $1  -m5 ) &> ../../res/C_ZPAQ_$1
+   ls -la $1.zpaq | awk '{ print $5;}' > ../../res/BC_ZPAQ_$1
+   rm -f $1 $1.zpaq;
+fi
+}
+
 #
 ###############################################################################
 # INSTALL
@@ -371,4 +408,161 @@ if [[ "$RUN_XM" -eq "1" ]]; then
    cd ../../
    echo "Done!";
 fi
+
+if [[ "$RUN_JARVIS" -eq "1" ]]; then
+   echo "Running JARVIS ...";
+   mkdir -p res
+   cd progs/jarvis
+
+   #ds4
+   RunJARVIS "-l 1"  "BuEb"
+   RunJARVIS "-l 2"  "AgPh"
+   RunJARVIS "-l 2"  "YeMi"
+   RunJARVIS "-l 3"  "HePy"
+   RunJARVIS "-l 3"  "AeCa"
+   RunJARVIS "-l 3"  "HaHi"
+   RunJARVIS "-l 4"  "EsCo"
+   RunJARVIS "-l 4"  "PlFa"
+   RunJARVIS "-l 4"  "ScPo"
+   RunJARVIS "-l 4"  "EnIn"
+   RunJARVIS "-l 5"  "DrMe"
+   RunJARVIS "-l 5"  "OrSa"
+   RunJARVIS "-l 5"  "DaRe"
+   RunJARVIS "-l 6"  "GaGa"
+   RunJARVIS "-l 7"  "HoSa"
+
+   #ds2 and ds3
+   RunJARVIS "-l 7"  "HoSaY"
+   RunJARVIS "-l 7"  "Mitochondrion"
+
+   RunJARVIS "-l 7"  "VDB"
+   RunJARVIS "-l 7"  "Archaea"
+
+   #ds1
+   #RunJARVIS "-l 7" "GoGoC"
+   #RunJARVIS "-l 7" "PaTrC"
+   #RunJARVIS "-l 7" "HoSaC"
+   #RunJARVIS "-l 7" "PiAbC"
+   #
+   cd ../../
+   echo "Done!";
+fi
 ###############################################################################
+## Gen purpose
+if [[ "$RUN_CMIX" -eq "1" ]]; then
+   echo "Running CMIX ...";
+   mkdir -p res
+   cd progs/cmix
+
+   #ds4
+   RunCMIX  "BuEb"
+   RunCMIX  "AgPh"
+   RunCMIX  "YeMi"
+   RunCMIX  "HePy"
+   RunCMIX  "AeCa"
+   RunCMIX  "HaHi"
+   RunCMIX  "EsCo"
+   RunCMIX  "PlFa"
+   #RunCMIX  "ScPo"
+   #RunCMIX  "EnIn"
+   #RunCMIX  "DrMe"
+   #RunCMIX  "OrSa"
+   #RunCMIX  "DaRe"
+   #RunCMIX  "GaGa"
+   #RunCMIX  "HoSa"
+
+   #ds2 and ds3
+   #RunCMIX  "HoSaY"
+   #RunCMIX  "Mitochondrion"
+
+   #RunCMIX  "VDB"
+   #RunCMIX  "Archaea"
+
+   #ds1
+   #RunCMIX "GoGoC"
+   #RunCMIX "PaTrC"
+   #RunCMIX "HoSaC"
+   #RunCMIX "PiAbC"
+   #
+   cd ../../
+   echo "Done!";
+fi
+
+if [[ "$RUN_DEEPZIP" -eq "1" ]]; then
+   echo "Running DEEPZIP ...";
+   mkdir -p res
+   cd progs/DeepZip
+
+   #ds4
+   RunDEEPZIP  "BuEb"
+   RunDEEPZIP  "AgPh"
+   RunDEEPZIP  "YeMi"
+   RunDEEPZIP  "HePy"
+   RunDEEPZIP  "AeCa"
+   RunDEEPZIP  "HaHi"
+   RunDEEPZIP  "EsCo"
+   RunDEEPZIP  "PlFa"
+   #RunDEEPZIP  "ScPo"
+   #RunDEEPZIP  "EnIn"
+   #RunDEEPZIP  "DrMe"
+   #RunDEEPZIP  "OrSa"
+   #RunDEEPZIP  "DaRe"
+   #RunDEEPZIP  "GaGa"
+   #RunDEEPZIP  "HoSa"
+
+   #ds2 and ds3
+   #RunDEEPZIP  "HoSaY"
+   #RunDEEPZIP  "Mitochondrion"
+
+   #RunDEEPZIP  "VDB"
+   #RunDEEPZIP  "Archaea"
+
+   #ds1
+   #RunDEEPZIP "GoGoC"
+   #RunDEEPZIP "PaTrC"
+   #RunDEEPZIP "HoSaC"
+   #RunDEEPZIP "PiAbC"
+   #
+   cd ../../
+   echo "Done!";
+fi
+
+
+if [[ "$RUN_ZPAQ" -eq "1" ]]; then
+   echo "Running ZPAQ ...";
+   mkdir -p res
+   cd progs/zpaq
+
+   #ds4
+   RunZPAQ  "BuEb"
+   RunZPAQ  "AgPh"
+   RunZPAQ  "YeMi"
+   RunZPAQ  "HePy"
+   RunZPAQ  "AeCa"
+   RunZPAQ  "HaHi"
+   RunZPAQ  "EsCo"
+   RunZPAQ  "PlFa"
+   RunZPAQ  "ScPo"
+   RunZPAQ  "EnIn"
+   RunZPAQ  "DrMe"
+   RunZPAQ  "OrSa"
+   RunZPAQ  "DaRe"
+   RunZPAQ  "GaGa"
+   RunZPAQ  "HoSa"
+
+   #ds2 and ds3
+   RunZPAQ  "HoSaY"
+   RunZPAQ  "Mitochondrion"
+
+   RunZPAQ  "VDB"
+   RunZPAQ  "Archaea"
+
+   #ds1
+   RunZPAQ "GoGoC"
+   RunZPAQ "PaTrC"
+   RunZPAQ "HoSaC"
+   RunZPAQ "PiAbC"
+   #
+   cd ../../
+   echo "Done!";
+fi
