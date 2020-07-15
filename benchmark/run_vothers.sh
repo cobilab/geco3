@@ -47,23 +47,25 @@ fi
 function RunNAF {
     # 1 - seq
 if test -f "../../ds/$1"; then
-   echo ">" ./$1.fasta
-   cat ../../ds/$1 >> ./$1.fasta
+   echo ">" > $1.fasta
+   cat ../../ds/$1 >> $1.fasta
    rm -f $1.fasta.naf
-   (time ./ENNAF --temp-dir /tmp -22 $1.fasta ) &> ../../res/C_NAF_$1
-   ls -la $1.fasta.naf | awk '{ print $5;}' > ../../res/BC_NAF_$1
-   rm -f $1 $1.fasta.naf;
+   (time ./ENNAF --temp-dir /tmp -22 $1.fasta -o $1.naf ) &> ../../res/C_NAF_$1
+   ls -la $1.naf | awk '{ print $5;}' > ../../res/BC_NAF_$1
+   rm -f $1.fasta $1.naf;
 fi
 }
 
 function RunXM {
     # 1 - seq
 if test -f "../../ds/$1"; then
-   cp ../../ds/$1 .
+   echo ">" > $1.fasta
+   cat ../../ds/$1 >> $1.fasta
+
    rm -f $1.xm
-   (time ./XM --real=$1.xm $1 ) &> ../../res/C_XM_$1
+   (time ./XM --real=$1.xm $1.fasta ) &> ../../res/C_XM_$1
    ls -la $1.xm | awk '{ print $5;}' > ../../res/BC_XM_$1
-   rm -f $1 $1.xm;
+   rm -f $1.fasta $1.xm;
 fi
 }
 
