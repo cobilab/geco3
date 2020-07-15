@@ -87,7 +87,7 @@ if test -f "../../ds/$1"; then
    cp ../../ds/$1 .
    rm -f $1.cmix
    (time ./cmix -c $1 $1.cmix ) &> ../../res/C_CMIX_$1
-   ls -la $2.jc | awk '{ print $5;}' > ../../res/BC_CMIX_$1
+   ls -la $1.cmix | awk '{ print $5;}' > ../../res/BC_CMIX_$1
    rm -f $1 $1.cmix;
 fi
 }
@@ -95,15 +95,21 @@ fi
 function RunDEEPZIP {
     # 1 - seq
 if test -f "../../ds/$1"; then
+   source tf/bin/activate
+   rm data/processed_files/*param.json data/processed_files/*npy
+   rm -rf data/files_to_be_compressed/
+   #rm -rf data/compressed/
+   mkdir -p data/files_to_be_compressed/
+   mkdir -p data/compressed/
    cp ../../ds/$1 data/files_to_be_compressed/$1
    cd data
    ./run_parser.sh
    cd ../src
-   (time ./run_experiments.sh biGRU ) &> ../../res/C_DEEPZIP_$1
+   (time ./run_experiments.sh biGRU ) &> ../../../res/C_DEEPZIP_$1
    cd ../data/compressed/
-   ls -la $1 | awk '{ print $5;}' > ../../res/BC_DEEPZIP_$1
+   ls -la $1/biGRU.compressed.combined | awk '{ print $5;}' > ../../../../res/BC_DEEPZIP_$1
    cd ../..
-   rm -f data/files_to_be_compressed/$1 data/compressed/$1;
+   #rm -rf data/files_to_be_compressed/$1 data/compressed/$1;
 fi
 }
 
@@ -205,6 +211,12 @@ if [[ "$INSTALL_DEEPZIP" -eq "1" ]]; then
     source tf/bin/activate
     bash install.sh
     deactivate
+    #params mentioned in paper
+    sed -i 's/batch_size=128/batch_size=1024/g' src/trainer.py
+    sed -i 's/num_epochs=20/num_epochs=3/g' src/trainer.py
+    #don't decompress
+    sed -i 's/\/usr\/bin\/time -v python decompressor.py/#\/usr\/bin\/time -v python decompressor.py/g' src/run_experiments.sh
+    sed -i 's/   cmp $recon_file_name/    #cmp $recon_file_name/g' src/run_experiments.sh
     cd ../
 fi
 ###############################################################################
