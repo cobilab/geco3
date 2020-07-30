@@ -134,7 +134,7 @@ void PrintMenuCompression(void){
 
   fprintf(stderr,
   "      -l [NUMBER],  --level [NUMBER]                                    \n"
-  "           Compression level (integer).                                 \n"
+  "           Compression level (integer [1;16]).                          \n"
   "           Default level: %u.                                           \n"
   "           It defines compressibility in balance with computational     \n"
   "           resources (RAM & time). Use -s for levels perception.        \n"
