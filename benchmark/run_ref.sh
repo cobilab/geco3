@@ -12,7 +12,7 @@ PARSE=0;
 RUN_GDC2=0;
 RUN_IDOCOMP=0;
 RUN_HRCM=0;
-RUN_GECO2=0;
+RUN_GECO2=1;
 RUN_GECO3=0;
 ###############################################################################
 #
@@ -34,22 +34,26 @@ if test -f "../../datasets/$1" && test -f "../../datasets/$2"; then
    cp ../../datasets/$1 .
    cp ../../datasets/$2 .
    rm -f xxx*
-   (time ./GDC2 c xxx $2 $1 ) &> ../../results/C_GDC_$1-$2
+   (/usr/bin/time -v ./GDC2 c xxx $2 $1 ) &> ../../results/C_GDC_$1-$2
    ls -la xxx.gdc2_rc | awk '{ print $5;}' > ../../results/BC_GDC_$1-$2
    rm -f $2 $1 xxx*;
 fi
 }
 #
 function RunGeCo2 {
-   PARAM=" -rm 20:500:1:35:0.95/3:100:0.95 -rm 13:200:1:1:0.95/0:0:0 -rm 10:10:0:0:0.95/0:0:0 ";
+    PARAMR=" -rm 20:500:1:35:0.95/3:100:0.95 -rm 13:200:1:1:0.95/0:0:0 -rm 10:10:0:0:0.95/0:0:0 -lr 0.03 -hs 64 ";
+    PARAMH=" -rm 20:500:1:35:0.95/3:100:0.95 -rm 13:200:1:1:0.95/0:0:0 -rm 10:10:0:0:0.95/0:0:0 -tm 4:1:0:1:0.9/0:0:0 -tm 17:100:1:10:0.95/2:20:0.95 -lr 0.03 -hs 64 ";
    # 1 - TARGET
    # 2 - REFERENCE
 if test -f "../../datasets/$1" && test -f "../../datasets/$2"; then
    cp ../../datasets/$1 .
    cp ../../datasets/$2 .
    rm -f $1.co
-   (time ./GeCo2 $PARAM -r $2 $1 ) &> ../../results/C_GECO2_REFO_$1-$2
-   ls -la $1.co | awk '{ print $5;}' > ../../results/BC_GECO2_REFO_$1-$2
+   (/usr/bin/time -v ./GeCo2 $PARAMR -r $2 $1 ) &> ../../results/C_GECO2R_REFO_$1-$2
+   ls -la $1.co | awk '{ print $5;}' > ../../results/BC_GECO2R_REFO_$1-$2
+
+   (/usr/bin/time -v ./GeCo2 $PARAMH -r $2 $1 ) &> ../../results/C_GECO2H_REFO_$1-$2
+   ls -la $1.co | awk '{ print $5;}' > ../../results/BC_GECO2H_REFO_$1-$2
    rm -f $2 $1 $1.co;
 fi
 }
@@ -63,10 +67,10 @@ if test -f "../../datasets/$1" && test -f "../../datasets/$2"; then
    cp ../../datasets/$1 .
    cp ../../datasets/$2 .
    rm -f $1.co
-   (time ./GeCo3 $PARAMR -r $2 $1 ) &> ../../results/C_GECO3R_REFO_$1-$2
+   (/usr/bin/time -v ./GeCo3 $PARAMR -r $2 $1 ) &> ../../results/C_GECO3R_REFO_$1-$2
    ls -la $1.co | awk '{ print $5;}' > ../../results/BC_GECO3R_REFO_$1-$2
 
-   (time ./GeCo3 $PARAMH -r $2 $1 ) &> ../../results/C_GECO3H_REFO_$1-$2
+   (/usr/bin/time -v ./GeCo3 $PARAMH -r $2 $1 ) &> ../../results/C_GECO3H_REFO_$1-$2
    ls -la $1.co | awk '{ print $5;}' > ../../results/BC_GECO3H_REFO_$1-$2
    rm -f $2 $1 $1.co;
 fi
@@ -79,7 +83,7 @@ if test -f "../../datasets-hrcm/$1.fasta" && test -f "../../datasets-hrcm/$2.fas
    cp ../../datasets-hrcm/$1.fasta .
    cp ../../datasets-hrcm/$2.fasta .
    rm -f $1.7z
-   (time ./hrcm compress -r $2.fasta -t $1.fasta ) &> ../../results/C_HRCM_REF_$1-$2
+   (/usr/bin/time -v ./hrcm compress -r $2.fasta -t $1.fasta ) &> ../../results/C_HRCM_REF_$1-$2
    ls -la $1.7z | awk '{ print $5;}' > ../../results/BC_HRCM_REF_$1-$2
    rm -f $2.fasta $1.fasta $1.7z;
 fi
@@ -98,7 +102,7 @@ if test -f "../../datasets/$1" && test -f "../../datasets/$2"; then
    (./generateSA.sh ref sa ) &> TIME_SA
    TIMEOFSA=`cat TIME_SA | grep "..." | awk '{ print $5;}'`
    echo "ref/$2.fa tar/$1.fa sa/$2.sa" > f.txt;
-   (./iDoComp.run c f.txt OUT ) &> ../../../results/C_IDOCOMP_$1-$2
+   (/usr/bin/time -v ./iDoComp.run c f.txt OUT ) &> ../../../results/C_IDOCOMP_$1-$2
    cat ../../../results/C_IDOCOMP_$1-$2 | grep "Compressed Size:" | awk '{ print $3; }' > ../../../results/BC_IDOCOMP_$1-$2
    CTIME=`cat ../../../results/C_IDOCOMP_$1-$2 | grep "CPU T" | awk '{print $4;}'`
    echo "$TIMEOFSA+$CTIME" | bc -l > ../../../results/CT_IDOCOMP_$1-$2
