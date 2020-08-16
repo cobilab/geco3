@@ -10,6 +10,7 @@ GeCo3 depends on `make` and `gcc`.
 cd src
 make
 ```
+**NOTE:** The default compilation options use micro-architecture dependent instructions, because GeCo3 greatly benefits from vector instructions. This means that due to the different floating point accuracies (e.g. fused multiply–add) the compressed file might not decompress with a binary compressed in a different computer or with a different compiler version or options. To ensure the file decompresses, use binaries (GeCo3 and GeDe3) that were compiled in the same environment.
 
 Example usage
 ----
