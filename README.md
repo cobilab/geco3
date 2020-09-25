@@ -1,4 +1,4 @@
-GeCo3
+![GeCo3](https://github.com/cobilab/geco3/blob/master/geco3.png?raw=true)
 ====
 GeCo3 is a DNA compressor that uses a neural network to do the mixing of experts.
 
