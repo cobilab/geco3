@@ -2,6 +2,13 @@
 ====
 GeCo3 is a DNA compressor that uses a neural network to do the mixing of experts.
 
+Installation
+---
+Installation is available with conda.
+```
+conda install -y -c bioconda geco3
+```
+
 Build
 ----
 GeCo3 depends on `make` and `gcc`.
