@@ -5,13 +5,13 @@ BIN    = .
 CC     = gcc
 CPLP   =
 #-----------------------------------------------------------------------------
-CFLAGS = -Wall -O3 -march=native -mtune=native $(CPLP)
+CFLAGS = -Wall -g -O2 -march=native -mtune=native $(CPLP)
 #-----------------------------------------------------------------------------
 LIBS   = -lm
 DEPS   = defs.h
 PROGS  = $(BIN)/GeCo3 $(BIN)/GeDe3
 OBJS   = mem.o msg.o common.o buffer.o levels.o pmodels.o context.o bitio.o \
-         arith.o arith_aux.o nn.o nnmodel.o mix.o
+         arith.o arith_aux.o nn.o nnmodel.o mix.o genann.o
 #-----------------------------------------------------------------------------
 all:
 	$(MAKE) progs
@@ -46,6 +46,8 @@ nnmodel.o: nnmodel.c nnmodel.h
 	$(CC) -c $(CFLAGS) nnmodel.c
 mix.o: mix.c mix.h
 	$(CC) -c $(CFLAGS) mix.c
+genann.o: genann.c genann.h
+	$(CC) -c $(CFLAGS) genann.c
 
 clean:
 	/bin/rm -f *.o

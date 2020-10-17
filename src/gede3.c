@@ -170,7 +170,7 @@ void Decompress(Parameters *P, CModel **cModels, uint8_t id){
 
     symbolBuffer->buf[symbolBuffer->idx] = sym = ArithDecodeSymbol(4, (int *) MX->freqs, (int) MX->sum, Reader);
 
-    mix_update_state(mxs, probs, sym, lr);
+    mix_update_state(mxs, probs, sym, lr, PT->freqs[sym]);
 
     outBuffer[idxOut] = NumToDNASym(sym);
 

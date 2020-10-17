@@ -13,11 +13,12 @@ mix_state_t* mix_init(uint32_t nmodels, uint32_t nsymbols, uint32_t hs) {
   mxs->nsymbols = nsymbols;
   int model_derived = 3; // hit, best, msym, bits
   int sequence_derived = 3; // last 7, last 15, last 50 symbols
-  int xs = (nmodels * (nsymbols + model_derived)) + (sequence_derived * nsymbols) + 1;
-  xs++; //bias neuron
-  printf("xs: %d\n", xs);
-  mxs->ann = ann_init(xs, hs, nsymbols);
-  mxs->ann->x[xs - 1]  = 1.0;
+  mxs->xs = (nmodels * (nsymbols + model_derived)) + (sequence_derived * nsymbols) + 1;
+  mxs->x = calloc(mxs->xs, sizeof(double));
+  mxs->y = calloc(4, sizeof(float));
+  printf("xs: %d\n", mxs->xs);
+
+  mxs->ann = genann_init(mxs->xs, 1, hs, nsymbols);//ann_init(xs, hs, nsymbols);
 
   // past symbols
   mxs->symlogs1 = 8; // empirically determined
@@ -25,6 +26,7 @@ mix_state_t* mix_init(uint32_t nmodels, uint32_t nsymbols, uint32_t hs) {
   mxs->symlogs3 = 64; // empirically determined
   mxs->symlog = calloc(mxs->symlogs3, sizeof(uint8_t));
 
+  
   // model performance
   mxs->hit = calloc(nmodels, sizeof(float));
   mxs->best = calloc(nmodels, sizeof(float));
@@ -40,23 +42,23 @@ mix_state_t* mix_init(uint32_t nmodels, uint32_t nsymbols, uint32_t hs) {
 }
 
 float const* mix(mix_state_t* mxs, float **probs) {
-  float *ret = mxs->ann->y;
   int i, j, k = 0;
   const float smean = mxs->smean;
   const uint32_t nmodels = mxs->nmodels;
   const uint32_t nsymbols = mxs->nsymbols;
+  
 
   for(i = 0; i < nmodels; ++i) {
     for(j = 0; j < nsymbols; ++j) {
-      mxs->ann->x[k++] = stretch(probs[i][j]) - smean;
+      mxs->x[k++] = stretch(probs[i][j]) - smean;
     }
 
-    mxs->ann->x[k++] = mxs->hit[i];
-    mxs->ann->x[k++] = mxs->best[i];
-    mxs->ann->x[k++] = mxs->bits[i];
+    mxs->x[k++] = mxs->hit[i];
+    mxs->x[k++] = mxs->best[i];
+    mxs->x[k++] = mxs->bits[i];
   }
 
-  mxs->ann->x[k++] = mxs->nnbits;
+  mxs->x[k++] = mxs->nnbits;
 
   int sf1[nsymbols];
   int sf2[nsymbols];
@@ -81,22 +83,26 @@ float const* mix(mix_state_t* mxs, float **probs) {
 
 
   for(i = 0; i < nsymbols; ++i) {
-    mxs->ann->x[k++] = (((float)sf1[i] / mxs->symlogs1) - 0.5) * 2;
-    mxs->ann->x[k++] = (((float)sf2[i] / mxs->symlogs2) - 0.5) * 2;
-    mxs->ann->x[k++] = (((float)sf3[i] / mxs->symlogs3) - 0.5) * 2;
+    mxs->x[k++] = (((float)sf1[i] / mxs->symlogs1) - 0.5) * 2;
+    mxs->x[k++] = (((float)sf2[i] / mxs->symlogs2) - 0.5) * 2;
+    mxs->x[k++] = (((float)sf3[i] / mxs->symlogs3) - 0.5) * 2;
   }
 
-  ann_apply(mxs->ann);
+  double const *prediction = genann_run(mxs->ann, mxs->x);
+  
+  for(i = 0; i < nsymbols; ++i) {
+    mxs->y[i] = prediction[i];
+  }
 
-  return ret;
+  return mxs->y;
 }
 
-void calc_aggregates(mix_state_t* mxs, float **probs, uint8_t sym) {
+void calc_aggregates(mix_state_t* mxs, float **probs, uint8_t sym, float psymbol) {
   const float lmean = mxs->lmean;
   const float a = 0.15;
   const float na = 1 - a;
 
-  const float nnb = -fasterlog2(mxs->ann->y[sym]) + lmean;
+  const float nnb = -fasterlog2(psymbol) + lmean;
   mxs->nnbits = (a * nnb) + (na * mxs->nnbits);
 
   const uint32_t nmodels = mxs->nmodels;
@@ -146,21 +152,21 @@ void calc_aggregates(mix_state_t* mxs, float **probs, uint8_t sym) {
   }
 }
 
-void mix_update_state(mix_state_t* mxs, float **probs, uint8_t sym, float learning_rate) {
-  calc_aggregates(mxs, probs, sym);
+void mix_update_state(mix_state_t* mxs, float **probs, uint8_t sym, float learning_rate, float psymbol) {
+  calc_aggregates(mxs, probs, sym, psymbol);
   // Train NN
-  float tdata[mxs->nsymbols];
+  double tdata[mxs->nsymbols];
   int i;
   for(i = 0 ; i < mxs->nsymbols; ++i) {
     tdata[i] = 0.0;
   }
   tdata[sym] = 1.0;
 
-  ann_train(mxs->ann, tdata, learning_rate);
+  genann_train(mxs->ann, mxs->x, tdata, learning_rate);
 }
 
 void mix_free(mix_state_t* mxs) {
-  ann_free(mxs->ann);
+  
   free(mxs->hit);
   free(mxs->best);
   free(mxs->bits);

@@ -232,11 +232,12 @@ void Compress(Parameters *P, CModel **cModels, uint8_t id, INF *I, float lr, uin
 
       for(n = 0 ; n < ALPHABET_SIZE ; ++n) {
         PT->freqs[n] = y[n];
+	PT->freqs[n] = fmax(PT->freqs[n], 0.00001);
+	PT->freqs[n] = fmin(PT->freqs[n], 0.99999);
       }
-
       ComputeMXProbs(PT, MX, 4);
 
-      mix_update_state(mxs, probs, sym, lr);
+      mix_update_state(mxs, probs, sym, lr, PT->freqs[sym]);
 
       AESym(sym, (int *)(MX->freqs), (int) MX->sum, Writter);
 
