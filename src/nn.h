@@ -13,6 +13,9 @@ typedef struct ann_t {
   float *y;
   float *wxh;
   float *why;
+
+  float *m;
+  float *v;
 } ann_t;
 
 ann_t* ann_init(uint64_t xs, uint64_t hs, uint64_t ys);
