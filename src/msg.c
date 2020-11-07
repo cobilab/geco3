@@ -85,9 +85,8 @@ void PrintMenuCompression(void){
   "      efficient compression and analysis of genomic sequences.          \n"
   "                                                                        \n"
   "AUTHORS                                                                 \n"
-  "      Diogo Pratas        pratas@ua.pt                                  \n"
   "      Milton Silva        teixeirasilva@ua.pt                           \n"
-  "      Morteza Hosseini    seyedmorteza@ua.pt                            \n"
+  "      Diogo Pratas        pratas@ua.pt                                  \n"
   "      Armando J. Pinho    ap@ua.pt                                      \n"
   "                                                                        \n"
   "SYNOPSIS                                                                \n"
@@ -195,9 +194,8 @@ void PrintMenuDecompression(void){
   "      decompress a genomic sequence compressed by GeCo3.                \n"
   "                                                                        \n"
   "AUTHORS                                                                 \n"
-  "      Diogo Pratas        pratas@ua.pt                                  \n"
   "      Milton Silva        teixeirasilva@ua.pt                           \n"
-  "      Morteza Hosseini    seyedmorteza@ua.pt                            \n"
+  "      Diogo Pratas        pratas@ua.pt                                  \n"
   "      Armando J. Pinho    ap@ua.pt                                      \n"
   "                                                                        \n"
   "SYNOPSIS                                                                \n"
@@ -258,7 +256,7 @@ void PrintVersion(void){
   "You may redistribute copies of it under the terms of the GNU - General  \n"
   "Public License v3 <http://www.gnu.org/licenses/gpl.html>. There is NOT  \n"
   "ANY WARRANTY, to the extent permitted by law. Developed and Written by  \n"
-  "Diogo Pratas, Morteza Hosseini and Armando J. Pinho.\n\n", VERSION, RELEASE);
+  "Milton Silva, Diogo Pratas and Armando J. Pinho.\n\n", VERSION, RELEASE);
   }
 
 
