@@ -5,7 +5,7 @@ BIN    = .
 CC     = gcc
 CPLP   =
 #-----------------------------------------------------------------------------
-CFLAGS = -Wall -O3 -march=native -mtune=native $(CPLP)
+CFLAGS = -Wall -Ofast -march=native -mtune=native $(CPLP)
 #-----------------------------------------------------------------------------
 LIBS   = -lm
 DEPS   = defs.h
