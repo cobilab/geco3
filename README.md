@@ -1,5 +1,10 @@
-![GeCo3](https://github.com/cobilab/geco3/blob/master/geco3.png?raw=true)
-====
+<p align="left">
+     <img src="https://github.com/cobilab/geco3/blob/master/geco3.png?raw=true" alt="GeCo3" height="140"/>
+</p>
+<a href="https://anaconda.org/bioconda/geco3"> <img src="https://anaconda.org/bioconda/geco3/badges/downloads.svg" /> </a>
+<a href="https://conda.anaconda.org/bioconda"> <img src="https://anaconda.org/bioconda/geco3/badges/installer/conda.svg" /> </a>
+<a href="https://anaconda.org/bioconda/geco3"> <img src="https://anaconda.org/bioconda/geco3/badges/platforms.svg" /> </a>
+
 GeCo3 is a DNA compressor that uses a neural network to do the mixing of experts.
 
 Installation
@@ -8,10 +13,6 @@ Installation is available with conda.
 ```
 conda install -y -c bioconda geco3
 ```
-
-<a href="https://anaconda.org/bioconda/geco3"> <img src="https://anaconda.org/bioconda/geco3/badges/downloads.svg" /> </a>
-<a href="https://conda.anaconda.org/bioconda"> <img src="https://anaconda.org/bioconda/geco3/badges/installer/conda.svg" /> </a>
-<a href="https://anaconda.org/bioconda/geco3"> <img src="https://anaconda.org/bioconda/geco3/badges/platforms.svg" /> </a>
 
 Build
 ----
