@@ -9,6 +9,10 @@ Installation is available with conda.
 conda install -y -c bioconda geco3
 ```
 
+<a href="https://anaconda.org/bioconda/geco3"> <img src="https://anaconda.org/bioconda/geco3/badges/downloads.svg" /> </a>
+<a href="https://conda.anaconda.org/bioconda"> <img src="https://anaconda.org/bioconda/geco3/badges/installer/conda.svg" /> </a>
+<a href="https://anaconda.org/bioconda/geco3"> <img src="https://anaconda.org/bioconda/geco3/badges/platforms.svg" /> </a>
+
 Build
 ----
 GeCo3 depends on `make` and `gcc`.
