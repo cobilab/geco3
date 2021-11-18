@@ -5,6 +5,7 @@
 <a href="https://conda.anaconda.org/bioconda"> <img src="https://anaconda.org/bioconda/geco3/badges/installer/conda.svg" /> </a>
 <a href="https://anaconda.org/bioconda/geco3"> <img src="https://anaconda.org/bioconda/geco3/badges/platforms.svg" /> </a>
 
+<br>
 GeCo3 is a DNA compressor that uses a neural network to do the mixing of experts.
 
 Installation
