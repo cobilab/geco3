@@ -2,7 +2,6 @@
      <img src="https://github.com/cobilab/geco3/blob/master/geco3.png?raw=true" alt="GeCo3" height="140"/>
 </p>
 <a href="https://anaconda.org/bioconda/geco3"> <img src="https://anaconda.org/bioconda/geco3/badges/downloads.svg" /> </a>
-<a href="https://conda.anaconda.org/bioconda"> <img src="https://binstar-static-prod.s3.amazonaws.com/latest/img/anaconda_org_logo.svg" width="20px"/> </a>
 <a href="https://anaconda.org/bioconda/geco3"> <img src="https://anaconda.org/bioconda/geco3/badges/platforms.svg" /> </a>
 
 <br>
